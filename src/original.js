@@ -1,47 +1,20 @@
-/**
- * @license
- * Copyright Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-// [START calendar_quickstart]
 const fs = require('fs');
 const readline = require('readline');
-const {google} = require('googleapis');
+const { google } = require('googleapis');
 
 // If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/calendar'];
+const SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
 const TOKEN_PATH = 'token.json';
 
-// Get list of all events with "CO" in the name. (Imperial computing events start with this). Save to file
-const credentials = fs.readFileSync('credentials.json')
-authorize(JSON.parse(credentials), listEvents)
-
-// Load file, and delete events with corresponding UIDS
-const filesmap = JSON.parse(fs.readFileSync('uidsCorrect.json'))
-for (i in filesmap) {
-  const uid = filesmap[i]
-  setTimeout(()=>{
-    console.log(uid)
-    authorize(JSON.parse(credentials), deleteEvent(uid))
-  }, 
-    i*250
-  )
-}
-
+// Load client secrets from a local file.
+fs.readFile('credentials.json', (err, content) => {
+  if (err) return console.log('Error loading client secret file:', err);
+  // Authorize a client with credentials, then call the Google Calendar API.
+  authorize(JSON.parse(content), listEvents);
+});
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -50,9 +23,10 @@ for (i in filesmap) {
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, callback) {
-  const {client_secret, client_id, redirect_uris} = credentials.installed;
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
-      client_id, client_secret, redirect_uris[0]);
+    client_id, client_secret, redirect_uris[0],
+  );
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {
@@ -98,44 +72,24 @@ function getAccessToken(oAuth2Client, callback) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 function listEvents(auth) {
-  const calendar = google.calendar({version: 'v3', auth});
+  const calendar = google.calendar({ version: 'v3', auth });
   calendar.events.list({
     calendarId: 'primary',
     timeMin: (new Date()).toISOString(),
-    maxResults: 500,
+    maxResults: 10,
     singleEvents: true,
     orderBy: 'startTime',
   }, (err, res) => {
-    if (err) return console.log('The API returned an error: ' + err);
+    if (err) return console.log(`The API returned an error: ${err}`);
     const events = res.data.items;
     if (events.length) {
-      const COevents = []
+      console.log('Upcoming 10 events:');
       events.map((event, i) => {
-        if (event.summary.startsWith("CO")) {
-          console.log(`${event.summary} - ${event.id}`);
-          COevents.push(event.id)
-        }
+        const start = event.start.dateTime || event.start.date;
+        console.log(`${start} - ${event.summary}`);
       });
-      fs.writeFileSync('uids.json', JSON.stringify(COevents))
     } else {
       console.log('No upcoming events found.');
     }
   });
 }
-
-const deleteEvent = UID => (auth) => {
-  const calendar = google.calendar({version: 'v3', auth});
-  calendar.events.delete({
-    calendarId: 'primary',
-    eventId: UID
-  }, (err, res) => {
-    if (err) return console.log('The event delete API returned an error: ' + err);
-    console.log("Finished deleting 1 event")
-  });
-}
-// [END calendar_quickstart]
-
-
-module.exports = {
-  SCOPES
-};

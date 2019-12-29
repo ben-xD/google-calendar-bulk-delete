@@ -4,11 +4,24 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "babel-node src/index.js --presets=@babel/preset-env",
+    "test": "",
+    "build": "babel src -d dist"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "googleapis": "^39.2.0"
+    "@babel/node": "^7.7.7",
+    "googleapis": "^46.0.0",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.19.1",
+    "nodemon": "^2.0.2"
   }
 }
