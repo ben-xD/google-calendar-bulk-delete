@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import readlineSync from 'readline-sync';
 import { google } from 'googleapis';
 
-export default class GoogleAuthentication {
+export default class GoogleAuthenticator {
   constructor(
     scopes = ['https://www.googleapis.com/auth/calendar'],
     tokenPath = 'token.json',
@@ -13,12 +13,16 @@ export default class GoogleAuthentication {
     this.credentialPath = credentialPath;
   }
 
+  authenticate(call) {
+    call(this.authClient);
+  }
+
   async authorize() {
     const credentials = this.getCredentialsFromFile();
-    const authClient = GoogleAuthentication.createOAuth2Client(JSON.parse(credentials));
+    const authClient = GoogleAuthenticator.createOAuth2Client(JSON.parse(credentials));
     const token = await this.getToken(authClient);
     authClient.setCredentials(token);
-    return authClient;
+    this.authClient = authClient;
   }
 
   async getToken(oAuth2Client) {
