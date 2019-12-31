@@ -1,8 +1,12 @@
 import { readFileSync, writeFileSync } from 'fs';
-import readlineSync from 'readline-sync';
+import * as readline from 'readline';
 import { google } from 'googleapis';
 
 export default class GoogleAuthenticator {
+  scopes: string[];
+  tokenPath: string;
+  credentialPath: string;
+  
   constructor(
     scopes = ['https://www.googleapis.com/auth/calendar'],
     tokenPath = 'token.json',
@@ -13,22 +17,18 @@ export default class GoogleAuthenticator {
     this.credentialPath = credentialPath;
   }
 
-  authenticate(call) {
-    call(this.authClient);
-  }
-
-  async authorize() {
+  async getCalendar() {
     const credentials = this.getCredentialsFromFile();
-    const authClient = GoogleAuthenticator.createOAuth2Client(JSON.parse(credentials));
-    const token = await this.getToken(authClient);
-    authClient.setCredentials(token);
-    this.authClient = authClient;
+    const auth = GoogleAuthenticator.createOAuth2Client(credentials);
+    const token = await this.getToken(auth);
+    auth.setCredentials(token);
+    return google.calendar({ version: 'v3', auth });
   }
 
   async getToken(oAuth2Client) {
     let token;
     try {
-      token = JSON.parse(readFileSync(this.tokenPath));
+      token = JSON.parse(readFileSync(this.tokenPath).toString());
     } catch (err) {
       const response = await this.getAccessToken(oAuth2Client);
       token = response.tokens;
@@ -48,7 +48,7 @@ export default class GoogleAuthenticator {
 
   getCredentialsFromFile() {
     try {
-      return readFileSync(this.credentialPath);
+      return JSON.parse(readFileSync(this.credentialPath).toString());
     } catch (err) {
       // throw err;
       throw 'Ensure your credentials.json file is present.';
@@ -61,9 +61,18 @@ export default class GoogleAuthenticator {
       scope: this.scopes,
     });
     console.log('Authorize this app by visiting this url:', authUrl);
-    const code = readlineSync.question('Enter the code from that page here: ');
+    const code = await readlineQuestion('Enter the code from that page here: ');
     const token = oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(token);
     return token;
   }
 }
+
+const readlineQuestion = (q: string): Promise<string> => {
+    return new Promise((res, rej) => {
+      const rl = readline.createInterface({input: process.stdin, output: process.stdout});
+      rl.question(q, (text) => {
+        res(text)
+      })
+    })
+} 

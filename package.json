@@ -2,26 +2,25 @@
   "name": "cal-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "babel-node src/index.js --presets=@babel/preset-env",
-    "test": "",
-    "build": "babel src -d dist"
+    "start": "ts-node ./src/index.ts",
+    "dev": "nodemon --watch 'src/**/*' --exec ts-node ./src/index.ts",
+    "build": "webpack"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/node": "^7.7.7",
-    "googleapis": "^46.0.0",
-    "readline-sync": "^1.4.10"
+    "googleapis": "^46.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.7",
-    "@babel/preset-env": "^7.7.7",
-    "babel-eslint": "^10.0.3",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.19.1",
-    "nodemon": "^2.0.2"
+    "@types/node": "^13.1.2",
+    "nodemon": "^2.0.2",
+    "source-map-loader": "^0.2.4",
+    "ts-loader": "^6.2.1",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   }
 }
