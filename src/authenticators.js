@@ -26,13 +26,13 @@ export default class GoogleAuthenticator {
   }
 
   async getToken(oAuth2Client) {
-    // Check if we have previously stored a token.
     let token;
     try {
       token = JSON.parse(readFileSync(this.tokenPath));
     } catch (err) {
-      token = await this.getAccessToken(oAuth2Client);
-      writeFileSync(this.tokenPath, JSON.stringify(token.tokens));
+      const response = await this.getAccessToken(oAuth2Client);
+      token = response.tokens;
+      writeFileSync(this.tokenPath, JSON.stringify(token));
       console.log('Token stored to', this.tokenPath);
     }
     return token;
