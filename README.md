@@ -1,5 +1,4 @@
-# Delete calendar events - currently in progress
-Did you accidentally add lots of events to your google calendar? Tweak this script, to programmatically delete unwanted events.
+# Google Calendar Bulk Delete - currently in progress
 
 Typed and promisified version of the Google Calendar NodeJS quickstart guide https://developers.google.com/calendar/quickstart/nodejs
 
