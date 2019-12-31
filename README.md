@@ -4,7 +4,8 @@ Did you accidentally add lots of events to your google calendar? Tweak this scri
 Typed and promisified version of the Google Calendar NodeJS quickstart guide https://developers.google.com/calendar/quickstart/nodejs
 
 Getting started:
-- Currently, you need a credentials.json
+- You need [NodeJS](https://nodejs.org/)
+- Currently, you need a credentials.json (generated from https://developers.google.com/calendar/quickstart/nodejs)
 - You need to generate a token.json file by running `npm start`: contains your access and refress tokens
 - Programmatically choose IDs to delete
 
