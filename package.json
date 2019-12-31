@@ -1,7 +1,7 @@
 {
-  "name": "cal-api",
+  "name": "Google Calendar API tool",
   "version": "1.0.0",
-  "description": "",
+  "description": "It is not possible to delete events by bulk through the google calendar web app. Use this tool to search for specific libraries, and delete them programatically. ",
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node ./src/index.ts",
