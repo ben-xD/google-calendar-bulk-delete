@@ -69,7 +69,7 @@ export default class GoogleAuthenticator {
     const code = await readlineQuestion('Enter the code from that page here: ');
     const token = await oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(token.tokens);
-    return token;
+    return token.tokens;
   }
 }
 
