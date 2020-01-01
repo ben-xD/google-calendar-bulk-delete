@@ -1,15 +1,19 @@
 {
-  "name": "Google Calendar API tool",
-  "version": "1.0.0",
-  "description": "It is not possible to delete events by bulk through the google calendar web app. Use this tool to search for specific libraries, and delete them programatically. ",
+  "name": "Google Calendar Bulk Delete",
+  "version": "0.1.0",
+  "description": "Bulk delete events on your google calendar to save time.",
   "main": "src/index.ts",
+  "repository": {
+    "url": "https://github.com/ZenBoat/google-calendar-bulk-delete",
+  },
   "scripts": {
     "start": "ts-node ./src/index.ts",
     "dev": "nodemon --watch 'src/**/*' --exec ts-node ./src/index.ts",
     "build": "webpack"
   },
-  "author": "",
+  "author": "Ben Butterworth <support@fresla.co>",
   "license": "ISC",
+  "keywords": ["calendar", "bulk", "delete"],
   "dependencies": {
     "googleapis": "^46.0.0"
   },
