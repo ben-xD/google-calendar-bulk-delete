@@ -1,5 +1,5 @@
 # Google Calendar Bulk Delete
-Want to delete lots of events from your calendar based on a specific property? The website doesn't support it. This node app does! It is a typed and promisified version of the Google Calendar NodeJS [quickstart guide](https://developers.google.com/calendar/quickstart/nodejs), which also includes an additional function to delete events based on ID.
+Want to delete lots of events from your calendar based on a specific event property? The website doesn't support it. This node app does! It is a typed and promisified version of the Google Calendar NodeJS [quickstart guide](https://developers.google.com/calendar/quickstart/nodejs), which also includes an additional function to delete events based on ID.
 
 How to use:
 - You need [NodeJS](https://nodejs.org/)

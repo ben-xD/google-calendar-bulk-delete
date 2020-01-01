@@ -1,6 +1,8 @@
 import { calendar_v3 } from 'googleapis';
 import { getFutureEvents, getCalendars, deleteEvent } from './calendarModification';
 import GoogleAuthenticator from './authenticators';
+import * as savedUserState from '../state.json'
+import * as fs from 'fs'
 import * as rl from 'readline-sync'
 
 async function main() {
@@ -10,21 +12,24 @@ async function main() {
   }
 
   // User should set this, OR interactively modify them with `npm start`
-  let searchString = "CO304 Logic-Based Learning"
-  let calendarId = "t3jokrcegkltgtod29ubrhihh0@group.calendar.google.com"
+
+  const savedUserState = JSON.parse(fs.readFileSync('state.json').toString());
+  let searchString = savedUserState.searchString
+  let calendarId = savedUserState.calendarId
+  console.log(`I will only search for events with '${searchString}' (searchString) in '${calendarId}'(calendarId) (set in state.json).`)
 
   const authenticator = new GoogleAuthenticator(options);
   let calendar: calendar_v3.Calendar;
 
   try {
-  calendar = await authenticator.getCalendar()
+    calendar = await authenticator.getCalendar()
   } catch (err) {
     console.error(err);
     console.error("Have you tried deleting token.json, and regenerating another one.")
     return
   }
-  
-  const defaultInput = rl.question("Do you want to change your calendarID or search string from the default set in index.ts? (Only 'y' & 'yes' will confirm (case insensitive).)");
+
+  const defaultInput = rl.question("Do you want to change your calendarID or search query? (Only 'y' & 'yes' will confirm (case insensitive).)");
   if (defaultInput.toLowerCase() == "yes" || defaultInput.toLowerCase() == "y") {
     console.log("Below are the calendars available from 'credentials.json'");
 
@@ -37,6 +42,23 @@ async function main() {
 
     calendarId = rl.question("Enter id for the calendar you want to delete events from: ");
     searchString = rl.question("Enter string to search events by: ")
+
+    const saveSearchInput = rl.question("Saving calendarID. Do you want to save your search string too?: ")
+
+    if (saveSearchInput.toLowerCase() == "yes" || saveSearchInput.toLowerCase() == "y") {
+      fs.writeFileSync(
+        'state.json',
+        JSON.stringify({
+          ...savedUserState,
+          calendarId,
+          searchString
+        }))
+    } else {
+      fs.writeFileSync('state.json', JSON.stringify({
+        ...savedUserState,
+        calendarId
+      }))
+    }
   }
 
   const events = await getFutureEvents(calendar, {
@@ -44,13 +66,10 @@ async function main() {
     calendarId,
     q: searchString
   });
-  console.info(events.map(event => ({
-    name: event.summary,
-    id: event.id
-  })));
+  console.info(events.map(event => event.summary));
 
   if (events.length == 0) {
-    console.log("No events exist under this search string and calendar ID. (You may have multiple 'calendars' in your calendar)")
+    console.log("No events exist under this search string and calendar ID. (You may have multiple 'calendars' in your calendar, choose the correct ID.)")
     return;
   }
 
@@ -60,8 +79,9 @@ async function main() {
     // is this slowing it down? Try Promise.all()
     const deletions = events.map(async (event) => await deleteEvent(calendarId, event.id)(calendar))
     await Promise.all(deletions)
-    console.info("All delelitions complete.")
+    console.info("All deletions complete.")
   }
 }
 
+// The entry point, if running node-ts index.ts. Won't be run if a package.
 main().catch(err => console.error(err))

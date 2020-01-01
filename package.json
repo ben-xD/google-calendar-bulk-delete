@@ -1,6 +1,5 @@
 {
   "name": "google-calendar-bulk-delete",
-  "private": true,
   "version": "0.1.0",
   "description": "Bulk delete events on your google calendar to save time.",
   "main": "src/index.ts",
