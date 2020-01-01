@@ -3,13 +3,12 @@ Want to delete lots of events from your calendar based on a specific property? T
 
 Getting started:
 - You need [NodeJS](https://nodejs.org/)
-- Currently, you need a credentials.json (generated from https://developers.google.com/calendar/quickstart/nodejs)
+- Currently, you need to generate a credentials.json (step 1) and place it in the root folder (generated from https://developers.google.com/calendar/quickstart/nodejs)
 - You need to generate a token.json file by running `npm start`: contains your access and refress tokens
 - Programmatically choose IDs to delete
 
 // TODO
-Finish todos in index.ts
-Create a custom credentials.json for this library, using ClientID (without secret)
-add bad token checking: e.g. insufficient scope, expired token, corrupted token
-Custom search string, to search through descriptions of events, returning array of event objects
-Publish on NPM
+Finish index.ts
+- add bad token checking: e.g. insufficient scope, expired token, corrupted token
+- Custom search string, to search through descriptions of events, returning array of event objects
+- Make react native app with functionality

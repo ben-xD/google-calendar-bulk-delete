@@ -2,23 +2,37 @@ import { readFileSync, writeFileSync } from 'fs';
 import * as readline from 'readline';
 import { google } from 'googleapis';
 
+
+interface Options {
+  scopes?: string[],
+  tokenPath: string,
+  credentialPath: string,
+}
+
 export default class GoogleAuthenticator {
   scopes: string[];
   tokenPath: string;
   credentialPath: string;
   
-  constructor(
-    scopes = ['https://www.googleapis.com/auth/calendar'],
-    tokenPath = 'token.json',
-    credentialPath = 'credentials.json',
-  ) {
-    this.scopes = scopes;
-    this.tokenPath = tokenPath;
-    this.credentialPath = credentialPath;
+
+  static defaultOptions = {
+    scopes: ['https://www.googleapis.com/auth/calendar'],
+ }
+  
+  constructor(options: Options) {
+    options = {...GoogleAuthenticator.defaultOptions, ...options};
+    this.scopes = options.scopes;
+    this.tokenPath = options.tokenPath;
+    this.credentialPath = options.credentialPath;
   }
 
-  async getCalendar() {
-    const credentials = this.getCredentialsFromFile();
+  async getUser() {
+    let credentials;
+    try {
+      credentials = JSON.parse(readFileSync(this.credentialPath).toString());
+    } catch (err) {
+      throw 'Ensure your credentials.json file is present.';
+    }
     const auth = GoogleAuthenticator.createOAuth2Client(credentials);
     const token = await this.getToken(auth);
     auth.setCredentials(token);
@@ -44,15 +58,6 @@ export default class GoogleAuthenticator {
       client_id, client_secret, redirect_uris[0],
     );
     return authClient;
-  }
-
-  getCredentialsFromFile() {
-    try {
-      return JSON.parse(readFileSync(this.credentialPath).toString());
-    } catch (err) {
-      // throw err;
-      throw 'Ensure your credentials.json file is present.';
-    }
   }
 
   async getAccessToken(oAuth2Client) {

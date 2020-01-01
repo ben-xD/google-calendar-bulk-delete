@@ -1,25 +1,51 @@
-import { getFutureEvents } from './calendarModification';
+import { getFutureEvents, getCalendars, deleteEvent } from './calendarModification';
 import GoogleAuthenticator from './authenticators';
 
 async function main() {
   // TODO get all calendar IDs for same user token
-  const authenticator = new GoogleAuthenticator();
-  // TODO new calendarID parameter
-  const calendar = await authenticator.getCalendar();
-  const events = await getFutureEvents(calendar, {
-    maxResults: 1,
-  });
-
-  console.info({events});
-
-  // TODO iterate over each event, searching in Summary, for "Graphics", store ids.
-  // TODO delete event by id.
+  const options = {
+    tokenPath: 'token.json',
+    credentialPath: 'credentials.json',
+ }
   
-  // deleteEvent('14hu0v3pimjrgr77c2fqiket2c')(calendar);
+  const authenticator = new GoogleAuthenticator(options);
+  const calendar = await authenticator.getUser()
+  // const calendars = await getCalendars(calendar);
+  // console.log(calendars.map(calendar => ({
+  //   id: calendar.id,
+  //   name: calendar.summary
+  // })))
+
+  const search_string = "Probabilistic inference"
+  const calendarId =  "t3jokrcegkltgtod29ubrhihh0@group.calendar.google.com"
+  
+  // Method 1: Requesting all events, and filtering them locally.
+  //   const events = await getFutureEvents(calendar, {
+  //     maxResults: 500,
+  //     calendarId
+  //   });
+
+  // console.info(events.filter(event => event.description.includes(search_string)).map(event => ({
+  //   name: event.description.split('\n')[0],
+  //   id: event.id
+  // })));
+
+  // Method 2: Query cal api with search string
+  const events = await getFutureEvents(calendar, {
+    maxResults: 500,
+    calendarId,
+    q: search_string
+  });
+    console.info(events.map(event => ({
+    name: event.description.split('\n')[0],
+    id: event.id
+  })));
+
+  // rate limited?
+  events.map(event => deleteEvent(calendarId, event.id)(calendar))
 }
 
-// TODO remove
-main()
+main().catch(err => console.error(err))
 
 
 // if (events.length) {

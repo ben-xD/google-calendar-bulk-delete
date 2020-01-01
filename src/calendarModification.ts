@@ -1,14 +1,6 @@
 import {calendar_v3} from 'googleapis';
 
-interface Options {
-  calendarId?: string,
-  timeMin?: string,
-  maxResults?: number,
-  singleEvents?: boolean,
-  orderBy?: string,
-}
-
-const defaultOptions: Options = {
+const defaultOptions: calendar_v3.Params$Resource$Events$List = {
   calendarId: 'primary',
   timeMin: (new Date()).toISOString(),
   maxResults: 10,
@@ -16,7 +8,7 @@ const defaultOptions: Options = {
   orderBy: 'startTime',
 }
 
-async function getFutureEvents(calendar: calendar_v3.Calendar, options: Options) {
+async function getFutureEvents(calendar: calendar_v3.Calendar, options: calendar_v3.Params$Resource$Events$List): Promise<calendar_v3.Schema$Event[]> {
   return new Promise((resolve, reject) => {
     calendar.events.list({
       ...defaultOptions,
@@ -28,9 +20,9 @@ async function getFutureEvents(calendar: calendar_v3.Calendar, options: Options)
   });
 }
 
-const deleteEvent = (UID) => (calendar) => {
+const deleteEvent = (calendarId, UID) => (calendar) => {
   calendar.events.delete({
-    calendarId: 'primary',
+    calendarId,
     eventId: UID,
   }, (err, res) => {
     if (err) return console.log(`The event delete API returned an error: ${err}`);
@@ -38,7 +30,12 @@ const deleteEvent = (UID) => (calendar) => {
   });
 };
 
-export { deleteEvent, getFutureEvents };
+const getCalendars = async (calendar: calendar_v3.Calendar) => {
+  const response = await calendar.calendarList.list();
+  return response.data.items;
+}
+
+export { getCalendars, deleteEvent, getFutureEvents };
 
 // const filesmap = JSON.parse(fs.readFileSync('uidsCorrect.json'));
 // for (i in filesmap) {
