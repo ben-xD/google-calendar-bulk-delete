@@ -1,3 +1,4 @@
+import { calendar_v3 } from 'googleapis';
 import { getFutureEvents, getCalendars, deleteEvent } from './calendarModification';
 import GoogleAuthenticator from './authenticators';
 import * as rl from 'readline-sync'
@@ -6,31 +7,40 @@ async function main() {
   const options = {
     tokenPath: 'token.json',
     credentialPath: 'credentials.json',
- }
+  }
 
- // User should set this, OR interactively modify them with `npm start`
- let searchString = "CO304 Logic-Based Learning"
- let calendarId =  "t3jokrcegkltgtod29ubrhihh0@group.calendar.google.com"
+  // User should set this, OR interactively modify them with `npm start`
+  let searchString = "CO304 Logic-Based Learning"
+  let calendarId = "t3jokrcegkltgtod29ubrhihh0@group.calendar.google.com"
+
+  const authenticator = new GoogleAuthenticator(options);
+  let calendar: calendar_v3.Calendar;
+
+  try {
+  calendar = await authenticator.getCalendar()
+  } catch (err) {
+    console.error(err);
+    console.error("Have you tried deleting token.json, and regenerating another one.")
+    return
+  }
   
- const authenticator = new GoogleAuthenticator(options);
- const calendar = await authenticator.getUser()
- const defaultInput = rl.question("Do you want to change your calendarID or search string from the default set in index.ts? (Only 'y' & 'yes' will confirm (case insensitive).)");
- if (defaultInput.toLowerCase() == "yes" || defaultInput.toLowerCase() == "y") {
-  console.log("Below are the calendars available from 'credentials.json'");
-  
-  // Get and list calendars in credentials.json
-  const calendars = await getCalendars(calendar);
-  console.log(calendars.map(calendar => ({
+  const defaultInput = rl.question("Do you want to change your calendarID or search string from the default set in index.ts? (Only 'y' & 'yes' will confirm (case insensitive).)");
+  if (defaultInput.toLowerCase() == "yes" || defaultInput.toLowerCase() == "y") {
+    console.log("Below are the calendars available from 'credentials.json'");
+
+    // Get and list calendars in credentials.json
+    const calendars = await getCalendars(calendar);
+    console.log(calendars.map(calendar => ({
       id: calendar.id,
       name: calendar.summary
-   })))
+    })))
 
-   calendarId = rl.question("Enter id for the calendar you want to delete events from: ");
-   searchString = rl.question("Enter string to search events by: ")
- }
+    calendarId = rl.question("Enter id for the calendar you want to delete events from: ");
+    searchString = rl.question("Enter string to search events by: ")
+  }
 
   const events = await getFutureEvents(calendar, {
-    maxResults: 500,
+    maxResults: 250,
     calendarId,
     q: searchString
   });
@@ -40,7 +50,7 @@ async function main() {
   })));
 
   if (events.length == 0) {
-    console.log("No events exist under this search string and calendar ID. (You may have multiple 'calendars' in your calendar.")
+    console.log("No events exist under this search string and calendar ID. (You may have multiple 'calendars' in your calendar)")
     return;
   }
 

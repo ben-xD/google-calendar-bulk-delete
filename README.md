@@ -8,8 +8,7 @@ How to use:
 - You need to generate a token.json file by running `npm start`: contains your access and refress tokens
 - Programmatically choose IDs to delete
 
-// TODO
-Finish index.ts
-- add bad token checking: e.g. insufficient scope, expired token, corrupted token
-- Custom search string, to search through descriptions of events, returning array of event objects
-- Make react native app with functionality
+# Examples
+![Terminal screenshot](https://i.imgur.com/evgBOXU.png "Example 1")
+
+- Make react native app with functionality (create oAuth app)

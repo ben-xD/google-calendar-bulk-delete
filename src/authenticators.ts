@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import * as readline from 'readline';
 import { google } from 'googleapis';
+import { OAuth2Client, Credentials } from 'google-auth-library';
 
 
 interface Options {
@@ -26,7 +27,7 @@ export default class GoogleAuthenticator {
     this.credentialPath = options.credentialPath;
   }
 
-  async getUser() {
+  async getCalendar() {
     let credentials;
     try {
       credentials = JSON.parse(readFileSync(this.credentialPath).toString());
@@ -34,41 +35,40 @@ export default class GoogleAuthenticator {
       throw 'Ensure your credentials.json file is present.';
     }
     const auth = GoogleAuthenticator.createOAuth2Client(credentials);
-    const token = await this.getToken(auth);
-    auth.setCredentials(token);
+    await this.setToken(auth);
     return google.calendar({ version: 'v3', auth });
   }
 
-  async getToken(oAuth2Client) {
-    let token;
+  async setToken(oAuth2Client: OAuth2Client): Promise<Credentials> {
+    let token: Credentials;
     try {
       token = JSON.parse(readFileSync(this.tokenPath).toString());
+      oAuth2Client.setCredentials(token);
+      await oAuth2Client.getTokenInfo(token.access_token); // validate token
     } catch (err) {
-      const response = await this.getAccessToken(oAuth2Client);
-      token = response.tokens;
+      const token = await this.getAccessToken(oAuth2Client);
       writeFileSync(this.tokenPath, JSON.stringify(token));
       console.log('Token stored to', this.tokenPath);
     }
     return token;
   }
 
-  static createOAuth2Client(credentials) {
+  static createOAuth2Client(credentials): OAuth2Client {
     const { client_secret, client_id, redirect_uris } = credentials.installed;
-    const authClient = new google.auth.OAuth2(
+    return new google.auth.OAuth2(
       client_id, client_secret, redirect_uris[0],
     );
-    return authClient;
   }
 
-  async getAccessToken(oAuth2Client) {
+  async getAccessToken(oAuth2Client: OAuth2Client) {
     const authUrl = oAuth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: this.scopes,
     });
     console.log('Authorize this app by visiting this url:', authUrl);
     const code = await readlineQuestion('Enter the code from that page here: ');
-    const token = oAuth2Client.getToken(code);
-    oAuth2Client.setCredentials(token);
+    const token = await oAuth2Client.getToken(code);
+    oAuth2Client.setCredentials(token.tokens);
     return token;
   }
 }

@@ -21,6 +21,7 @@
     "delete"
   ],
   "dependencies": {
+    "google-auth-library": "^5.7.0",
     "googleapis": "^46.0.0",
     "readline-sync": "^1.4.10"
   },
