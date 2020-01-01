@@ -11,8 +11,6 @@ async function main() {
     credentialPath: 'credentials.json',
   }
 
-  // User should set this, OR interactively modify them with `npm start`
-
   const savedUserState = JSON.parse(fs.readFileSync('state.json').toString());
   let searchString = savedUserState.searchString
   let calendarId = savedUserState.calendarId

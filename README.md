@@ -9,6 +9,6 @@ How to use:
 - Programmatically choose IDs to delete
 
 # Examples
-![Terminal screenshot](https://i.imgur.com/evgBOXU.png "Example 1")
+![Terminal screenshot](https://i.imgur.com/Z5YHj6t.png"Example 1")
 
 - Make react native app with functionality (create oAuth app)
