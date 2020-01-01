@@ -9,9 +9,9 @@ How to use:
 - Programmatically choose IDs to delete
 
 # Examples
-![Terminal screenshot](https://i.imgur.com/Z5YHj6t.png"Example 1")
+![Terminal screenshot](https://i.imgur.com/Z5YHj6t.png "Example 1")
 
 # Known issues
-- You cannot see input into command line, when launching `npm start` for the first time. Input still works though.
+- You cannot see input into command line, when launching `npm start` for the first time (no token.json yet). Input still works though.
 
 - Make react native app with functionality (create oAuth app)
