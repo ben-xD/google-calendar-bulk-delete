@@ -1,59 +1,57 @@
 import { getFutureEvents, getCalendars, deleteEvent } from './calendarModification';
 import GoogleAuthenticator from './authenticators';
+import * as rl from 'readline-sync'
 
 async function main() {
-  // TODO get all calendar IDs for same user token
   const options = {
     tokenPath: 'token.json',
     credentialPath: 'credentials.json',
  }
+
+ // User should set this, OR interactively modify them with `npm start`
+ let searchString = "CO304 Logic-Based Learning"
+ let calendarId =  "t3jokrcegkltgtod29ubrhihh0@group.calendar.google.com"
   
-  const authenticator = new GoogleAuthenticator(options);
-  const calendar = await authenticator.getUser()
-  // const calendars = await getCalendars(calendar);
-  // console.log(calendars.map(calendar => ({
-  //   id: calendar.id,
-  //   name: calendar.summary
-  // })))
-
-  const search_string = "Probabilistic inference"
-  const calendarId =  "t3jokrcegkltgtod29ubrhihh0@group.calendar.google.com"
+ const authenticator = new GoogleAuthenticator(options);
+ const calendar = await authenticator.getUser()
+ const defaultInput = rl.question("Do you want to change your calendarID or search string from the default set in index.ts? (Only 'y' & 'yes' will confirm (case insensitive).)");
+ if (defaultInput.toLowerCase() == "yes" || defaultInput.toLowerCase() == "y") {
+  console.log("Below are the calendars available from 'credentials.json'");
   
-  // Method 1: Requesting all events, and filtering them locally.
-  //   const events = await getFutureEvents(calendar, {
-  //     maxResults: 500,
-  //     calendarId
-  //   });
+  // Get and list calendars in credentials.json
+  const calendars = await getCalendars(calendar);
+  console.log(calendars.map(calendar => ({
+      id: calendar.id,
+      name: calendar.summary
+   })))
 
-  // console.info(events.filter(event => event.description.includes(search_string)).map(event => ({
-  //   name: event.description.split('\n')[0],
-  //   id: event.id
-  // })));
+   calendarId = rl.question("Enter id for the calendar you want to delete events from: ");
+   searchString = rl.question("Enter string to search events by: ")
+ }
 
-  // Method 2: Query cal api with search string
   const events = await getFutureEvents(calendar, {
     maxResults: 500,
     calendarId,
-    q: search_string
+    q: searchString
   });
-    console.info(events.map(event => ({
-    name: event.description.split('\n')[0],
+  console.info(events.map(event => ({
+    name: event.summary,
     id: event.id
   })));
 
-  // rate limited?
-  events.map(event => deleteEvent(calendarId, event.id)(calendar))
+  if (events.length == 0) {
+    console.log("No events exist under this search string and calendar ID. (You may have multiple 'calendars' in your calendar.")
+    return;
+  }
+
+  const deleteString = rl.question('Do you want to delete ALL events shown above? (Only y, yes will confirm (case insensitive).)');
+  if ((deleteString.toLowerCase() == "yes" || deleteString.toLowerCase() == "y")) {
+    console.log("Confirmed, deleting events: ")
+    // is this slowing it down? Try Promise.all()
+    const deletions = events.map(async (event) => await deleteEvent(calendarId, event.id)(calendar))
+    await Promise.all(deletions)
+    console.info("All delelitions complete.")
+  }
 }
 
 main().catch(err => console.error(err))
-
-
-// if (events.length) {
-// console.log('Upcoming 10 events:');
-// events.map((event, i) => {
-//   const start = event.start.dateTime || event.start.date;
-//   console.log(`${event.id}:${start} - ${event.summary}`);
-// });
-// } else {
-// console.log('No upcoming events found.');
-// }

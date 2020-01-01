@@ -15,9 +15,14 @@
   },
   "author": "Ben Butterworth <ben@fresla.co>",
   "license": "ISC",
-  "keywords": ["calendar", "bulk", "delete"],
+  "keywords": [
+    "calendar",
+    "bulk",
+    "delete"
+  ],
   "dependencies": {
-    "googleapis": "^46.0.0"
+    "googleapis": "^46.0.0",
+    "readline-sync": "^1.4.10"
   },
   "devDependencies": {
     "@types/node": "^13.1.2",

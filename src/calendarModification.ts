@@ -20,14 +20,16 @@ async function getFutureEvents(calendar: calendar_v3.Calendar, options: calendar
   });
 }
 
-const deleteEvent = (calendarId, UID) => (calendar) => {
-  calendar.events.delete({
-    calendarId,
-    eventId: UID,
-  }, (err, res) => {
-    if (err) return console.log(`The event delete API returned an error: ${err}`);
-    console.log('Finished deleting 1 event');
-  });
+const deleteEvent = (calendarId: string, UID: string) => (calendar: calendar_v3.Calendar): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    calendar.events.delete({
+      calendarId,
+      eventId: UID,
+    }, (err, res) => {
+      if (err) return reject(Error(`The event delete API returned an error: ${err}`));
+      resolve(console.log('Finished deleting 1 event'));
+    });
+  })
 };
 
 const getCalendars = async (calendar: calendar_v3.Calendar) => {
