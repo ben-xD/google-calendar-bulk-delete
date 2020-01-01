@@ -10,7 +10,7 @@ Want to delete lots of events from your calendar based on a specific event prope
 ## Example
 There is an interactive program, `example.ts` which guides you along to deleting events in bulk via the command line. 
 - Install Node, dependencies (`npm i`), run the program `npm start`
-- Enable Google Calendar API for your account, which effectively creates you a personal app (`credentials.json`). There is no data at risk here, as you have created an app. It doesn't yet have permission to access anyones data.
+- Click [Enable Google Calendar API](https://developers.google.com/calendar/quickstart/nodejs) for your account, which effectively creates you a personal app (`credentials.json`). There is no data at risk here, as you have created an app. It doesn't yet have permission to access anyones data.
 - Run `npm start`
 - Then, you authorize your app (above) to gain access to your calendar account, by opening the link (`token.json`). You need to generate a credentials.json (step 1) and place it in the repo folder 
 - You need to generate a token.json file by running `npm start`: contains your access and refress tokens
