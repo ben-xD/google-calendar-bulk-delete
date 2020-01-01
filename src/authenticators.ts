@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import * as readline from 'readline';
 import { google } from 'googleapis';
 import { OAuth2Client, Credentials } from 'google-auth-library';
+import { GetTokenResponse } from 'google-auth-library/build/src/auth/oauth2client';
 
 
 interface Options {
@@ -35,20 +36,22 @@ export default class GoogleAuthenticator {
       throw 'Ensure your credentials.json file is present.';
     }
     const auth = GoogleAuthenticator.createOAuth2Client(credentials);
-    await this.setToken(auth);
+    const token = await this.getToken(auth);
+    auth.setCredentials(token)
     return google.calendar({ version: 'v3', auth });
   }
 
-  async setToken(oAuth2Client: OAuth2Client): Promise<Credentials> {
-    let token: Credentials;
+  async getToken(oAuth2Client: OAuth2Client): Promise<Credentials> {
+    let token;
     try {
       token = JSON.parse(readFileSync(this.tokenPath).toString());
-      oAuth2Client.setCredentials(token);
-      await oAuth2Client.getTokenInfo(token.access_token); // validate token
+      await oAuth2Client.getTokenInfo(token.access_token);
+      // oAuth2Client.setCredentials(token);
     } catch (err) {
-      const token = await this.getAccessToken(oAuth2Client);
+      token = await this.getAccessToken(oAuth2Client);
       writeFileSync(this.tokenPath, JSON.stringify(token));
       console.log('Token stored to', this.tokenPath);
+      // oAuth2Client.setCredentials(token);
     }
     return token;
   }
@@ -60,7 +63,7 @@ export default class GoogleAuthenticator {
     );
   }
 
-  async getAccessToken(oAuth2Client: OAuth2Client) {
+  async getAccessToken(oAuth2Client: OAuth2Client): Promise<Credentials> {
     const authUrl = oAuth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: this.scopes,
@@ -68,7 +71,6 @@ export default class GoogleAuthenticator {
     console.log('Authorize this app by visiting this url:', authUrl);
     const code = await readlineQuestion('Enter the code from that page here: ');
     const token = await oAuth2Client.getToken(code);
-    oAuth2Client.setCredentials(token.tokens);
     return token.tokens;
   }
 }

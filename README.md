@@ -11,4 +11,7 @@ How to use:
 # Examples
 ![Terminal screenshot](https://i.imgur.com/Z5YHj6t.png"Example 1")
 
+# Known issues
+- You cannot see input into command line, when launching `npm start` for the first time. Input still works though.
+
 - Make react native app with functionality (create oAuth app)

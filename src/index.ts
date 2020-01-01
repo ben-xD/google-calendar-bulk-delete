@@ -5,6 +5,9 @@ import * as savedUserState from '../state.json'
 import * as fs from 'fs'
 import * as rl from 'readline-sync'
 
+// TODO ensure not running when packaged
+main().catch(err => console.error(err))
+
 async function main() {
   const options = {
     tokenPath: 'token.json',
@@ -27,36 +30,9 @@ async function main() {
     return
   }
 
-  const defaultInput = rl.question("Do you want to change your calendarID or search query? (Only 'y' & 'yes' will confirm (case insensitive).)");
+  const defaultInput = rl.question("Do you want to change your calendarID or search query? (Only 'y' & 'yes' will confirm (case insensitive).): ");
   if (defaultInput.toLowerCase() == "yes" || defaultInput.toLowerCase() == "y") {
-    console.log("Below are the calendars available from 'credentials.json'");
-
-    // Get and list calendars in credentials.json
-    const calendars = await getCalendars(calendar);
-    console.log(calendars.map(calendar => ({
-      id: calendar.id,
-      name: calendar.summary
-    })))
-
-    calendarId = rl.question("Enter id for the calendar you want to delete events from: ");
-    searchString = rl.question("Enter string to search events by: ")
-
-    const saveSearchInput = rl.question("Saving calendarID. Do you want to save your search string too?: ")
-
-    if (saveSearchInput.toLowerCase() == "yes" || saveSearchInput.toLowerCase() == "y") {
-      fs.writeFileSync(
-        'state.json',
-        JSON.stringify({
-          ...savedUserState,
-          calendarId,
-          searchString
-        }))
-    } else {
-      fs.writeFileSync('state.json', JSON.stringify({
-        ...savedUserState,
-        calendarId
-      }))
-    }
+    await updateUserState(calendar);
   }
 
   const events = await getFutureEvents(calendar, {
@@ -81,5 +57,32 @@ async function main() {
   }
 }
 
-// The entry point, if running node-ts index.ts. Won't be run if a package.
-main().catch(err => console.error(err))
+async function updateUserState(calendar: calendar_v3.Calendar) {
+  console.log("Below are the calendars available from 'credentials.json'");
+
+  // Get and list calendars in credentials.json
+  const calendars = await getCalendars(calendar);
+  console.log(calendars.map(calendar => ({
+    id: calendar.id,
+    name: calendar.summary
+  })))
+
+  const calendarId = rl.question("Enter id for the calendar you want to delete events from: ");
+  const searchString = rl.question("Enter string to search events by: ")
+  const saveSearchInput = rl.question("Saving calendarID. Do you want to save your search string too?: ")
+
+  if (saveSearchInput.toLowerCase() == "yes" || saveSearchInput.toLowerCase() == "y") {
+    fs.writeFileSync(
+      'state.json',
+      JSON.stringify({
+        ...savedUserState,
+        calendarId,
+        searchString
+      }))
+  } else {
+    fs.writeFileSync('state.json', JSON.stringify({
+      ...savedUserState,
+      calendarId
+    }))
+  }
+}
