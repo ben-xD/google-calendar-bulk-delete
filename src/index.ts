@@ -20,6 +20,7 @@ async function main() {
   console.log(`I will only search for events with '${searchString}' (searchString) in '${calendarId}'(calendarId) (set in state.json).`)
 
   const authenticator = new GoogleAuthenticator(options);
+
   let calendar: calendar_v3.Calendar;
 
   try {
@@ -32,7 +33,33 @@ async function main() {
 
   const defaultInput = rl.question("Do you want to change your calendarID or search query? (Only 'y' & 'yes' will confirm (case insensitive).): ");
   if (defaultInput.toLowerCase() == "yes" || defaultInput.toLowerCase() == "y") {
-    await updateUserState(calendar);
+    console.log("Below are the calendars available from 'credentials.json'");
+
+    // Get and list calendars in credentials.json
+    const calendars = await getCalendars(calendar);
+    console.log(calendars.map(calendar => ({
+      id: calendar.id,
+      name: calendar.summary
+    })))
+  
+    calendarId = rl.question("Enter id for the calendar you want to delete events from: ");
+    searchString = rl.question("Enter string to search events by: ")
+    const saveSearchInput = rl.question("Saving calendarID. Do you want to save your search string too?: ")
+  
+    if (saveSearchInput.toLowerCase() == "yes" || saveSearchInput.toLowerCase() == "y") {
+      fs.writeFileSync(
+        'state.json',
+        JSON.stringify({
+          ...savedUserState,
+          calendarId,
+          searchString
+        }))
+    } else {
+      fs.writeFileSync('state.json', JSON.stringify({
+        ...savedUserState,
+        calendarId
+      }))
+    }
   }
 
   const events = await getFutureEvents(calendar, {
@@ -54,35 +81,5 @@ async function main() {
     const deletions = events.map(async (event) => await deleteEvent(calendarId, event.id)(calendar))
     await Promise.all(deletions)
     console.info("All deletions complete.")
-  }
-}
-
-async function updateUserState(calendar: calendar_v3.Calendar) {
-  console.log("Below are the calendars available from 'credentials.json'");
-
-  // Get and list calendars in credentials.json
-  const calendars = await getCalendars(calendar);
-  console.log(calendars.map(calendar => ({
-    id: calendar.id,
-    name: calendar.summary
-  })))
-
-  const calendarId = rl.question("Enter id for the calendar you want to delete events from: ");
-  const searchString = rl.question("Enter string to search events by: ")
-  const saveSearchInput = rl.question("Saving calendarID. Do you want to save your search string too?: ")
-
-  if (saveSearchInput.toLowerCase() == "yes" || saveSearchInput.toLowerCase() == "y") {
-    fs.writeFileSync(
-      'state.json',
-      JSON.stringify({
-        ...savedUserState,
-        calendarId,
-        searchString
-      }))
-  } else {
-    fs.writeFileSync('state.json', JSON.stringify({
-      ...savedUserState,
-      calendarId
-    }))
   }
 }
