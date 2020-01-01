@@ -1,7 +1,6 @@
 import { calendar_v3 } from 'googleapis';
-import { getFutureEvents, getCalendars, deleteEvent } from './calendarModification';
-import GoogleAuthenticator from './authenticators';
-import * as savedUserState from '../state.json'
+import { getFutureEvents, getCalendars, deleteEvent } from '../src/calendarModification';
+import GoogleAuthenticator from '../src/authenticators';
 import * as fs from 'fs'
 import * as rl from 'readline-sync'
 
