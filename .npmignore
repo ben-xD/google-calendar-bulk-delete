@@ -1,0 +1,7 @@
+src/**/*
+examples/**/*
+
+node_modules
+**/token.js*
+**/credentials.json
+**/state.json

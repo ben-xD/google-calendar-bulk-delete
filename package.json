@@ -2,7 +2,8 @@
   "name": "google-calendar-bulk-delete",
   "version": "0.2.1",
   "description": "Bulk delete events on your google calendar to save time.",
-  "main": "examples/bulkDeleter.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "homepage": "https://github.com/ZenBoat/google-calendar-bulk-delete",
   "repository": {
     "url": "github:ZenBoat/google-calendar-bulk-delete"
