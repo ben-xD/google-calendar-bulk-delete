@@ -1,17 +1,19 @@
 {
-  "name": "Google Calendar Bulk Delete",
+  "name": "google-calendar-bulk-delete",
+  "private": true,
   "version": "0.1.0",
   "description": "Bulk delete events on your google calendar to save time.",
   "main": "src/index.ts",
+  "homepage": "https://github.com/ZenBoat/google-calendar-bulk-delete",
   "repository": {
-    "url": "https://github.com/ZenBoat/google-calendar-bulk-delete",
+    "url": "github:ZenBoat/google-calendar-bulk-delete"
   },
   "scripts": {
     "start": "ts-node ./src/index.ts",
     "dev": "nodemon --watch 'src/**/*' --exec ts-node ./src/index.ts",
     "build": "webpack"
   },
-  "author": "Ben Butterworth <support@fresla.co>",
+  "author": "Ben Butterworth <ben@fresla.co>",
   "license": "ISC",
   "keywords": ["calendar", "bulk", "delete"],
   "dependencies": {

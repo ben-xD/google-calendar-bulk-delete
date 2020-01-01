@@ -18,6 +18,7 @@ async function main() {
   // deleteEvent('14hu0v3pimjrgr77c2fqiket2c')(calendar);
 }
 
+// TODO remove
 main()
 
 
